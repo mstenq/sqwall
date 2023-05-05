@@ -1,8 +1,9 @@
 import { JSXNode, QRL } from "@builder.io/qwik";
+import { PickVariantsByType } from "../../types/PickVariantsByType";
 
 type RenderIconProps = QRL<({ isOpen }: { isOpen: boolean }) => JSXNode>;
 
-export type AccordionThemeProps = {
+export type AccordionThemeStyle = {
   accordionRoot: string;
   item: string;
   summary: string;
@@ -12,19 +13,28 @@ export type AccordionThemeProps = {
 };
 
 export interface AccordionVariant {
-  default: true;
+  base: "variant";
 }
+
+export type AccordionVariantKey = keyof AccordionVariant;
 
 export type AccordionType = "multiple" | "single";
 
 export type AccordionTheme = {
-  defaultVariant: keyof AccordionVariant;
+  defaultVariant: AccordionVariantKey | Array<AccordionVariantKey>;
   defaultType: AccordionType;
-  variants: Record<keyof AccordionVariant, AccordionThemeProps>;
+  variants: Record<
+    PickVariantsByType<AccordionVariant, "variant">,
+    AccordionThemeStyle
+  >;
+  variantShortcuts?: Record<
+    PickVariantsByType<AccordionVariant, "shortcut">,
+    Array<PickVariantsByType<AccordionVariant, "variant">>
+  >;
 };
 
 export type AccordionState = {
-  variant: keyof AccordionVariant;
+  variantKeys: Array<AccordionVariantKey>;
   type: AccordionType;
   items: Record<
     string,

@@ -5,10 +5,11 @@ import {
   useContext,
   useContextProvider,
 } from "@builder.io/qwik";
-import { AccordionTheme } from "@/components";
+import { AccordionTheme, ButtonTheme } from "../components";
 
 export type Theme = {
   accordion: AccordionTheme;
+  button: ButtonTheme;
 };
 
 const ThemeContext = createContextId<Theme>("theme");

@@ -1,50 +1,65 @@
-import { useTheme } from "@/theme/ThemeProvider";
-import { calculateStyles } from "@/utils/calculateStyles";
 import {
   Slot,
   component$,
   useContextProvider,
+  useSignal,
   useStore,
 } from "@builder.io/qwik";
+import { useScopedKeyboardNavigation } from "../../hooks/useScopedKeyboardNavigation";
+import { useTheme } from "../../theme/ThemeProvider";
+import { ComponentStyle } from "../../types";
+import {
+  calculateStyles,
+  getAsArray,
+  reduceVariantShortcuts,
+} from "../../utils";
+import {} from "../../utils/getAsArray";
 import {
   AccordionState,
   AccordionType,
-  AccordionVariant,
+  AccordionVariantKey,
 } from "./Accordion.types";
 import { Item } from "./Item";
 import { AccordionContext } from "./accordionContext";
-import { ComponentStyle } from "@/types";
 
-export type AccordionRootProps = ComponentStyle & {
-  color?: string;
-  variant?: keyof AccordionVariant;
+export type AccordionProps = ComponentStyle & {
+  variant?: Array<AccordionVariantKey> | AccordionVariantKey;
   type?: AccordionType;
+  wrapFocus?: boolean;
 };
 
-const AccordionRoot = component$(
-  ({ type, variant, ...props }: AccordionRootProps) => {
-    const { accordion } = useTheme();
-    const componentVariant = variant ?? accordion.defaultVariant;
+const AccordionRoot = component$((props: AccordionProps) => {
+  const { accordion } = useTheme();
+  const accordionRef = useSignal<Element>();
 
-    const accordionState = useStore<AccordionState>({
-      variant: componentVariant,
-      type: type ?? accordion.defaultType,
-      items: {},
-    });
+  useScopedKeyboardNavigation(accordionRef, "[data-accordion-button]", {
+    wrap: props.wrapFocus ?? true,
+  });
 
-    useContextProvider(AccordionContext, accordionState);
-    return (
-      <div
-        {...calculateStyles(
-          accordion.variants[componentVariant].accordionRoot,
-          props
-        )}
-      >
-        <Slot />
-      </div>
-    );
-  }
-);
+  const accordionState = useStore<AccordionState>({
+    variantKeys: reduceVariantShortcuts(
+      accordion,
+      getAsArray(props.variant ?? accordion.defaultVariant)
+    ),
+    type: props.type ?? accordion.defaultType,
+    items: {},
+  });
+
+  useContextProvider(AccordionContext, accordionState);
+  return (
+    <div
+      ref={accordionRef}
+      {...calculateStyles(
+        "accordionRoot",
+        accordion,
+        accordionState.variantKeys,
+        props
+      )}
+    >
+      <Slot />
+    </div>
+  );
+});
 
 export const Accordion = Object.assign(AccordionRoot, {
   Item,

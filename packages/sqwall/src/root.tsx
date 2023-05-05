@@ -1,5 +1,6 @@
-import { Counter } from './components/counter/counter';
-import { Logo } from './components/logo/logo';
+import Sample from "./sample";
+import { theme } from "./sample/theme/theme";
+import { ThemeProvider } from "./theme";
 
 export default () => {
   return (
@@ -9,8 +10,9 @@ export default () => {
         <title>Qwik Blank App</title>
       </head>
       <body>
-        <Logo />
-        <Counter />
+        <ThemeProvider theme={theme}>
+          <Sample />
+        </ThemeProvider>
       </body>
     </>
   );

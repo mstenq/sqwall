@@ -2,10 +2,14 @@ import { Slot, component$, useId, useTask$ } from "@builder.io/qwik";
 import { Detail } from "./Detail";
 import { Summary } from "./Summary";
 import { useAccordionState } from "./accordionContext";
-import { useTheme } from "@/theme";
-import { useDetermineDataAttributes } from "./utils";
+import { useTheme } from "../../theme";
+import { useDetermineDataAttributes } from "./useDetermineDataAttributes";
+import { calculateStyles } from "../../utils/calculateStyles";
+import { ComponentStyle } from "../../types";
 
-export const Item = component$(() => {
+type AccordionItemProps = ComponentStyle;
+
+export const Item = component$((props: AccordionItemProps) => {
   const id = useId();
   const { accordion } = useTheme();
   const accordionState = useAccordionState();
@@ -17,8 +21,9 @@ export const Item = component$(() => {
   return (
     <div
       {...dataAttributes}
-      class={accordion.variants[accordionState.variant].item}
+      {...calculateStyles("item", accordion, accordionState.variantKeys, props)}
     >
+      <span />
       <Summary id={id}>
         <Slot name="summary" />
       </Summary>

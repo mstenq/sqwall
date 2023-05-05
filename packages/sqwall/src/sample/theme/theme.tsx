@@ -1,8 +1,6 @@
-import type { Theme } from "sqwall";
+import type { Theme } from "../../theme";
 import { accordion } from "./accordionTheme";
-import { button } from "./buttonTheme";
 
 export const theme: Theme = {
   accordion,
-  button,
 };

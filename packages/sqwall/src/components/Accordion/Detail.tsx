@@ -1,4 +1,4 @@
-import { useTheme } from "@/theme";
+import { useTheme } from "../../theme";
 import {
   Slot,
   component$,
@@ -8,9 +8,13 @@ import {
 } from "@builder.io/qwik";
 import { animate } from "motion";
 import { useAccordionState } from "./accordionContext";
-import { useDetermineDataAttributes } from "./utils";
+import { useDetermineDataAttributes } from "./useDetermineDataAttributes";
+import { calculateStyles } from "../../utils/calculateStyles";
+import { ComponentStyle } from "../../types";
 
-export const Detail = component$(({ id }: { id: string }) => {
+type AccordionDetailProps = ComponentStyle & { id: string };
+
+export const Detail = component$(({ id, ...props }: AccordionDetailProps) => {
   const initialized = useSignal<boolean>(false);
   const { accordion } = useTheme();
   const accordionState = useAccordionState();
@@ -49,7 +53,12 @@ export const Detail = component$(({ id }: { id: string }) => {
     <div ref={ref} id={elementId} style={{ height: 0, overflowY: "hidden" }}>
       <div
         {...dataAttributes}
-        class={accordion.variants[accordionState.variant].detail}
+        {...calculateStyles(
+          "detail",
+          accordion,
+          accordionState.variantKeys,
+          props
+        )}
       >
         <Slot />
       </div>

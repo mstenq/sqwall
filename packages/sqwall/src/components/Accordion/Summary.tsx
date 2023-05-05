@@ -1,9 +1,13 @@
-import { useTheme } from "@/theme";
+import { useTheme } from "../../theme";
 import { $, Slot, component$ } from "@builder.io/qwik";
 import { useAccordionState } from "./accordionContext";
-import { useDetermineDataAttributes } from "./utils";
+import { useDetermineDataAttributes } from "./useDetermineDataAttributes";
+import { ComponentStyle } from "../../types";
+import { calculateStyles } from "../../utils/calculateStyles";
 
-export const Summary = component$(({ id }: { id: string }) => {
+type AccordionSummaryProps = ComponentStyle & { id: string };
+
+export const Summary = component$(({ id, ...props }: AccordionSummaryProps) => {
   const { accordion } = useTheme();
   const accordionState = useAccordionState();
   const dataAttributes = useDetermineDataAttributes(id);
@@ -21,14 +25,32 @@ export const Summary = component$(({ id }: { id: string }) => {
     accordionState.items[id].isOpen = !accordionState.items[id]?.isOpen;
   });
 
-  const renderStartIcon = accordion.variants[accordionState.variant].startIcon$;
-  const renderEndIcon = accordion.variants[accordionState.variant].endIcon$;
+  // Get start icon from any available variant
+  const variantWithStartIcon = accordionState.variantKeys.find(
+    (variantKey) => accordion.variants[variantKey].startIcon$
+  );
+  const renderStartIcon =
+    variantWithStartIcon &&
+    accordion.variants[variantWithStartIcon]?.startIcon$;
+
+  // get end icon from any available variant
+  const variantWithEndIcon = accordionState.variantKeys.find(
+    (variantKey) => accordion.variants[variantKey].endIcon$
+  );
+  const renderEndIcon =
+    variantWithEndIcon && accordion.variants[variantWithEndIcon]?.endIcon$;
 
   return (
     <button
+      data-accordion-button
       onClick$={handleClick}
       {...dataAttributes}
-      class={accordion.variants[accordionState.variant].summary}
+      {...calculateStyles(
+        "summary",
+        accordion,
+        accordionState.variantKeys,
+        props
+      )}
     >
       {renderStartIcon?.({ isOpen: accordionState.items[id].isOpen })}
       <Slot />
